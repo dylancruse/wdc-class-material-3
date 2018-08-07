@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.http import HttpResponseNotFound
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.contrib import messages
 
@@ -30,6 +30,15 @@ def create_book(request):
         'isbn': request.POST['isbn'],
         'popularity': request.POST['popularity'],
     }
+    
+    author = get_object_or_404(Author, id=request.POST['author'])
+    book = Book.objects.create(
+        author=author,
+        title=request.POST['title'],
+        isbn=request.POST['isbn'],
+        popularity=request.POST['popularity']
+        )
+    
     return render(request, 'create_book.html', {
         'data': book_data
     })
