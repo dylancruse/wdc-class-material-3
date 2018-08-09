@@ -15,6 +15,9 @@ def index(request):
         books = books.order_by('popularity')
     elif sort_method == 'desc':
         books = books.order_by('-popularity')
+    query = request.GET.get('query')
+    if query:
+        books = books.filter(title__icontains=query)
     return render(request, 'index.html', {
         'books': books,
         'authors': Author.objects.all(),
@@ -40,7 +43,8 @@ def create_book(request):
         )
     
     return render(request, 'create_book.html', {
-        'data': book_data
+        'data': book_data,
+        'book_created': book
     })
 
 
