@@ -26,7 +26,11 @@ def index(request):
 
 
 def create_book(request):
-    messages.success(request, 'Book has been created!')
+    title = request.POST.get('title')
+    if not title:
+        messages.error(request, 'Missing field')
+        return redirect('/?errors=1&error_title=1')
+
     book_data = {
         'title': request.POST['title'],
         'author': request.POST['author'],
@@ -41,7 +45,7 @@ def create_book(request):
         isbn=request.POST['isbn'],
         popularity=request.POST['popularity']
         )
-    
+    messages.success(request, 'Book has been created!')
     return render(request, 'create_book.html', {
         'data': book_data,
         'book_created': book
