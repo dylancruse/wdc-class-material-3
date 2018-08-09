@@ -36,10 +36,11 @@
     </table>
     <p><a href="{% url 'authors' %}">Prefer to browse by author?</a></p>
     <h1>Create a new book</h1>
-    <form class="" action="/create_book" method="POST">
+    <form class="" action="" method="POST">
       {% csrf_token %}
       <label for="title">Title:</label>
-      <input id="title" type="text" name='title' value=''>
+      <input id="title" type="text" name="title" value="{{form_values.title}}" {% if errors.title %}style='border: 1px red solid'{% endif %}>
+      {% if errors.title %}{{ errors.title }}{% endif %}
 
        <br>
 
@@ -53,12 +54,14 @@
       <br>
 
       <label for="isbn">ISBN:</label>
-      <input id="isbn" type="text" name='isbn' value='XYZ'>
-
+      <input id="isbn" type="text" name="isbn" value="{{form_values.isbn}}" {% if errors.isbn %}style='border: 1px red solid'{% endif %}>
+      {% if errors.isbn %}{{errors.isbn}}{% endif %}
+      
       <br>
 
       <label for="popularity">Popularity:</label>
-      <input id="popularity" type="number" name='popularity' value='3.5' step="0.1">
+      <input id="popularity" type="text" name="popularity" value="Enter a number" {% if errors.popularity %}style='border: 1px red solid'{% endif %}>
+      {% if errors.popularity %}{{errors.popularity}}{% endif %}
       <br>
       <input type="submit" value="Create book">
     </form>
