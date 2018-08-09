@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.contrib import messages
@@ -9,6 +9,30 @@ from .models import Author, Book
 
 
 def index(request):
+    errors = {}
+    form_values = {
+        'title': '',
+        'isbn': ''
+    }
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        popularity = request.POST.get('popularity')
+        isbn = request.POST.get('isbn')
+        if not isbn:
+            errors['isbn'] = 'ISBN cannot be blank'
+        else:
+            form_values['isbn'] = isbn
+        if not title:
+            errors['title'] = 'Title cannot be blank'
+        else:
+            form_values['title'] = title
+        try:
+            popularity = float(popularity)
+        except ValueError:
+            errors['popularity'] = 'Invalid Value'
+        #still need to create the book in the database
+        
+    # GET:
     sort_method = request.GET.get('sort', 'asc')
     books = Book.objects.all()
     if sort_method == 'asc':
@@ -20,6 +44,8 @@ def index(request):
         books = books.filter(title__icontains=query)
     return render(request, 'index.html', {
         'books': books,
+        'errors': errors,
+        'form_values': form_values,
         'authors': Author.objects.all(),
         'sort_method': sort_method
     })
@@ -30,13 +56,6 @@ def create_book(request):
     if not title:
         messages.error(request, 'Missing field')
         return redirect('/?errors=1&error_title=1')
-
-    book_data = {
-        'title': request.POST['title'],
-        'author': request.POST['author'],
-        'isbn': request.POST['isbn'],
-        'popularity': request.POST['popularity'],
-    }
     
     author = get_object_or_404(Author, id=request.POST['author'])
     book = Book.objects.create(
@@ -45,6 +64,12 @@ def create_book(request):
         isbn=request.POST['isbn'],
         popularity=request.POST['popularity']
         )
+    book_data = {
+        'title': request.POST['title'],
+        'author': request.POST['author'],
+        'isbn': request.POST['isbn'],
+        'popularity': request.POST['popularity'],
+    }
     messages.success(request, 'Book has been created!')
     return render(request, 'create_book.html', {
         'data': book_data,
